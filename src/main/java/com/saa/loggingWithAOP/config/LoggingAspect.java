@@ -13,7 +13,7 @@ import org.aspectj.lang.annotation.Before;
 
 import java.time.LocalDateTime;
 
-//@Slf4j
+//@Slf4j /* commented it because we do not want to use SLf4j we want to use AOP with custom message*/
 @Aspect
 @Component
 public class LoggingAspect {
@@ -43,7 +43,10 @@ public class LoggingAspect {
 
     @AfterThrowing(pointcut = "execution(* com.saa.loggingWithAOP..*(..))",throwing = "exception")
     public void logMethodCallAfterException(JoinPoint joinPoint, Exception exception) {
-        logger.info("AfterThrowing Aspect - {} has thrown an exception {}"
-                ,  joinPoint, exception.getCause().toString());
+        logger.error("Exception thrown in method: {} with arguments: {} and exception message: {}",
+                joinPoint.getSignature().toShortString(),
+                joinPoint.getArgs(),
+                exception.getMessage(),
+                exception, exception.getCause().toString());
     }
 }
