@@ -1,15 +1,13 @@
 package com.saa.loggingWithAOP.config;
 
-import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 
 import java.time.LocalDateTime;
 
@@ -48,5 +46,31 @@ public class LoggingAspect {
                 joinPoint.getArgs(),
                 exception.getMessage(),
                 exception, exception.getCause().toString());
+    }
+
+    @Around("execution(* com.saa.loggingWithAOP..*(..))")
+    public void logMethodAroundCall(ProceedingJoinPoint joinPoint) throws Throwable  {
+        LocalDateTime localTime = LocalDateTime.now();
+        String datetimeString = localTime.toString();
+        System.out.println("Around before "+datetimeString);
+        logger.info("Entering With Logger {} parameters {} entering time {}",
+                joinPoint.getSignature().toShortString(),
+                joinPoint.getArgs(),
+                datetimeString);
+        Object result;
+        try {
+            result = joinPoint.proceed(); // Proceed with method execution
+        } catch (Exception e) {
+            // Log exception
+            System.err.println("Exception in method: " + joinPoint.getSignature().toShortString() + " with message: " + e.getMessage());
+            throw e;
+        }
+        datetimeString = localTime.toString();
+        logger.info("Exiting With Logger {} parameters {} exiting time {}",
+                joinPoint.getSignature().toShortString(),
+                joinPoint.getArgs(),
+                datetimeString);
+        System.out.println("Around after "+datetimeString);
+
     }
 }
